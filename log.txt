@@ -1,0 +1,2 @@
+2022-12-19 12:03:10,376 DEBUG urllib3.connectionpool Starting new HTTPS connection (1): api.genderize.io:443
+2022-12-19 12:03:10,603 DEBUG urllib3.connectionpool https://api.genderize.io:443 "GET /?name%5B%5D=Petronila&name%5B%5D=Evangelina&name%5B%5D=Randee&name%5B%5D=Elsie&name%5B%5D=Roosevelt&name%5B%5D=Laronda&name%5B%5D=Christian&name%5B%5D=Isa&name%5B%5D=Janna HTTP/1.1" 200 613
