@@ -168,7 +168,7 @@ def genderize(args):
                         if not data:
                             writer.writerow(row)
                         else:
-                            writer.writerow(row + [data[2], data[0], data[1]])
+                            writer.writerow(row + [data[0], data[1], data[2]])
 
 
                     
@@ -179,9 +179,9 @@ def genderize(args):
 
                 #Create master dict
                 gender_dict = dict()
-                    for response in gender_responses:
-                        for d in response:
-                            gender_dict[d.get("name")] = [d.get("gender"), d.get("probability"), d.get("count")]
+                for response in gender_responses:
+                    for d in response:
+                        gender_dict[d.get("name")] = [d.get("gender"), d.get("probability"), d.get("count")]
 
                 filename, file_extension = os.path.splitext(ofile)
                 with open(filename, 'w', newline='', encoding="utf8") as f:
