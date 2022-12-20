@@ -59,17 +59,36 @@ def genderize(args):
     #Open ifile
     with open(ifile, 'r', encoding="utf8") as csvfile:
         readCSV = csv.reader(csvfile, delimiter=',')
-        names = []
+        rows = []
+
+        
+        
         for row in readCSV: #Read CSV into names list
-            names.append(row)
+            rows.append(row)
+
+        #
+        header = rows[0]
+        name_index = -1
+        for i in range(len(header)):
+            column = header[i]
+            if 'name' in column:
+                name_index = i
+                break
+        
 
         if args.noheader == False:
-            names.pop(0) #Remove header
+            rows.pop(0) #Remove header
+        names = []
 
+        for row in rows:
+            name = row[name_index]
+            names.append([name])
+        
         o_names = list()
         for l in names:
             for b in l:
                 o_names.append(b)
+        
 
         if args.auto == True:
             uniq_names = list(set(o_names))
@@ -98,7 +117,8 @@ def genderize(args):
         gender_responses = list()
         with open(ofile, 'w', newline='', encoding="utf8") as f:
             writer = csv.writer(f)
-            writer.writerow(list(["names", "gender", "probability", "count"]))
+            # writer.writerow(list(["count", "gender", "name","probability"]))
+            writer.writerow(list(header + ["gender", "probability", "count"]))
             chunks_len = len(chunks)
             stopped = False
             for index, chunk in enumerate(chunks):
@@ -135,10 +155,23 @@ def genderize(args):
                     response_time.append(time.time() - start)
                     print("Processed chunk " + str(index + 1) + " of " + str(chunks_len) + " -- Time remaining (est.): " + \
                         str( round( (sum(response_time) / len(response_time) * (chunks_len - index - 1)), 3)) + "s")
+                    
 
-                    for data in dataset:
-                        writer.writerow(data.values())
-                    break
+                    gender_dict = dict()
+                    for response in gender_responses:
+                        for d in response:
+                            gender_dict[d.get("name")] = [d.get("gender"), d.get("probability"), d.get("count")]
+
+                    for row in rows:  
+                        name = row[name_index]
+                        data = gender_dict.get(name)
+                        if not data:
+                            writer.writerow(row)
+                        else:
+                            writer.writerow(row + [data[2], data[0], data[1]])
+
+
+                    
 
             if args.auto == True:
                 print("\nCompleting identical names...\n")
@@ -146,9 +179,9 @@ def genderize(args):
 
                 #Create master dict
                 gender_dict = dict()
-                for response in gender_responses:
-                    for d in response:
-                        gender_dict[d.get("name")] = [d.get("gender"), d.get("probability"), d.get("count")]
+                    for response in gender_responses:
+                        for d in response:
+                            gender_dict[d.get("name")] = [d.get("gender"), d.get("probability"), d.get("count")]
 
                 filename, file_extension = os.path.splitext(ofile)
                 with open(filename, 'w', newline='', encoding="utf8") as f:
